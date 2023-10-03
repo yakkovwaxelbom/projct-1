@@ -88,7 +88,9 @@ def euclid(a, b) -> int:
     return euclid(b, a % b)
 
 
-# print(euclid(230, 100))
+def foreign_numbers(a, b) -> int:
+    if euclid(a, b) == 1:
+        return True
 
 
 def third_maximum_number(array: list) -> float:
@@ -98,12 +100,23 @@ def third_maximum_number(array: list) -> float:
     return max(array)
 
 
-def connecting_matrices(matrix1: list, matrix2: list) -> list:
-    solution = [[0 for column in range(len(matrix1[0]))] for row in range(len(matrix1))]
+def addition_matrices(matrix1: list, matrix2: list) -> list:
     if len(matrix1) == len(matrix2) and len(matrix1[0]) == len(matrix2[0]):
+        solution = [[0 for column in range(len(matrix1[0]))] for row in range(len(matrix1))]
         for i in range(len(matrix1)):
             for j in range(len(matrix1[0])):
                 solution[i][j] = matrix1[i][j] + matrix2[i][j]
+        return solution
+    else:
+        raise ValueError("Illegal connecting")
+
+
+def subtraction_matrices(matrix1: list, matrix2: list) -> list:
+    if len(matrix1) == len(matrix2) and len(matrix1[0]) == len(matrix2[0]):
+        solution = [[0 for column in range(len(matrix1[0]))] for row in range(len(matrix1))]
+        for i in range(len(matrix1)):
+            for j in range(len(matrix1[0])):
+                solution[i][j] = matrix1[i][j] - matrix2[i][j]
         return solution
     else:
         raise ValueError("Illegal connecting")
@@ -124,10 +137,71 @@ def matrix_multiplication(matrix1: list, matrix2: list) -> np:
 
 
 def recession_matrix_multiplication(matrix1: list, matrix2: list) -> np:
-    if len(matrix1) <= 1:
-        return [sum(a * b for a, b in zip(matrix1[0], matrix2[0]))]
+    if len(matrix1) == len(matrix1[0]) and len(matrix2) == len(matrix2[0]) and en(matrix1) == len(matrix2[0]):
+        if len(matrix1) == 1:
+            return [[matrix1[0][0] * matrix2[0][0]]]
+        # I divide the matrices into 8 matrices whose size is n/2
+        a, b, c, d, e, f, g, h = [], [], [], [], [], [], [], []
+        for i in range(len(matrix1) // 2):
+            a.append([j for j in matrix1[i][:len(matrix1) // 2]])
+        for i in range(len(matrix1) // 2):
+            b.append([j for j in matrix1[i][len(matrix1) // 2:]])
+        for i in range(len(matrix1) // 2):
+            c.append([j for j in matrix1[i + len(matrix1) // 2][:len(matrix1) // 2]])
+        for i in range(len(matrix1) // 2):
+            d.append([j for j in matrix1[i + len(matrix1) // 2][len(matrix1) // 2:]])
+        for i in range(len(matrix2) // 2):
+            e.append([j for j in matrix2[i][:len(matrix2) // 2]])
+        for i in range(len(matrix2) // 2):
+            f.append([j for j in matrix2[i][len(matrix2) // 2:]])
+        for i in range(len(matrix2) // 2):
+            g.append([j for j in matrix2[i + len(matrix2) // 2][:len(matrix2) // 2]])
+        for i in range(len(matrix2) // 2):
+            h.append([j for j in matrix2[i + len(matrix2) // 2][len(matrix2) // 2:]])
+        # I recursively call each sub-matrix
+        a_e = recession_matrix_multiplication(a, e)
+        b_g = recession_matrix_multiplication(b, g)
+        a_f = recession_matrix_multiplication(a, f)
+        b_h = recession_matrix_multiplication(b, h)
+        c_e = recession_matrix_multiplication(c, e)
+        d_g = recession_matrix_multiplication(d, g)
+        c_f = recession_matrix_multiplication(c, f)
+        d_h = recession_matrix_multiplication(d, h)
+        # I connect the sub-matrices to solve a quarter matrix
+        quadrant1 = addition_matrices(a_e, b_g)
+        quadrant2 = addition_matrices(a_f, b_h)
+        quadrant3 = addition_matrices(c_e, d_g)
+        quadrant4 = addition_matrices(c_f, d_h)
+        x, y = [], []
+        for i in range(len(quadrant1[0])):
+            x.append(quadrant1[i] + quadrant2[i])
+        for i in range(len(quadrant1[0])):
+            y.append(quadrant3[i] + quadrant4[i])
+        return x + y
 
 
+def transpose_matrix(matrix: list) -> np:
+    solution = [[0 for column in range(len(matrix))] for row in range(len(matrix[0]))]
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            solution[j][i] = matrix[i][j]
+    return np.asmatrix(solution)
+
+
+a = [[2, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
+b = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
+print(subtraction_matrices(a,b))
+
+
+# A = [2]
+# B = [2]
+# print([a * b] for a, b in (A[0], B[0]))
+# print(connecting_matrices(a, b))
+
+
+def recession_matrix_multiplication(matrix1: list, matrix2: list) -> np:
+    if len(matrix1) == 1:
+        return [[matrix1[0][0] * matrix2[0][0]]]
     # I divide the matrices into 8 matrices whose size is n/2
     a, b, c, d, e, f, g, h = [], [], [], [], [], [], [], []
     for i in range(len(matrix1) // 2):
@@ -147,18 +221,18 @@ def recession_matrix_multiplication(matrix1: list, matrix2: list) -> np:
     for i in range(len(matrix2) // 2):
         h.append([j for j in matrix2[i + len(matrix2) // 2][len(matrix2) // 2:]])
     # I recursively call each sub-matrix
-    a_e = recession_matrix_multiplication(a, e)
-    b_g = recession_matrix_multiplication(b, g)
-    a_f = recession_matrix_multiplication(a, f)
-    b_h = recession_matrix_multiplication(b, h)
-    c_e = recession_matrix_multiplication(c, e)
-    d_g = recession_matrix_multiplication(d, g)
-    c_f = recession_matrix_multiplication(c, f)
-    d_h = recession_matrix_multiplication(d, h)
+    p_1 = recession_matrix_multiplication(addition_matrices(a, d), connecting_matrices(e, h))
+    p_2 = recession_matrix_multiplication(addition_matrices(c, d), e)
+    p_3 = recession_matrix_multiplication(a, subtraction_matrices(f,h))
+    p_4 = recession_matrix_multiplication(d, subtraction_matrices(g,e))
+    p_5 = recession_matrix_multiplication(addition_matrices(a,b), h)
+    p_6 = recession_matrix_multiplication(subtraction_matrices(c, a),addition_matrices(e,f))
+    p_7 = recession_matrix_multiplication(subtraction_matrices(b,d), addition_matrices(g,h))
+
     # I connect the sub-matrices to solve a quarter matrix
     quadrant1 = connecting_matrices(a_e, b_g)
-    quadrant2 = connecting_matrices(a_f, b_h)
-    quadrant3 = connecting_matrices(c_e, d_g)
+    quadrant2 = connecting_matrices(p_3, p_5)
+    quadrant3 = connecting_matrices(p_2, p_4)
     quadrant4 = connecting_matrices(c_f, d_h)
     x, y = [], []
     for i in range(len(quadrant1[0])):
@@ -166,17 +240,3 @@ def recession_matrix_multiplication(matrix1: list, matrix2: list) -> np:
     for i in range(len(quadrant1[0])):
         y.append(quadrant3[i] + quadrant4[i])
     return x + y
-
-
-def transpose_matrix(matrix: list) -> np:
-    solution = [[0 for column in range(len(matrix))] for row in range(len(matrix[0]))]
-    for i in range(len(matrix)):
-        for j in range(len(matrix[0])):
-            solution[j][i] = matrix[i][j]
-    return np.asmatrix(solution)
-
-
-a = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
-b = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
-print(recession_matrix_multiplication(a,b))
-
