@@ -155,12 +155,12 @@ class Game:
                 self.play_round(len(self.player_1.hand) - 1, len(self.player_2.hand) - 1, True)
         # self.play_round(i, i)
 
-    def play_round(self, i=0, j=0, test=False):
-        if self.player_1.hand[i].__gt__(self.player_2.hand[j]) and test is False:
+    def play_round(self, i=0, j=0, draw_war=False):
+        if self.player_1.hand[i].__gt__(self.player_2.hand[j]) and draw_war is False:
             self.receive_and_take_cards(True, j=j + 1)
-        elif self.player_1.hand[i].__lt__(self.player_2.hand[j]) and test is False:
+        elif self.player_1.hand[i].__lt__(self.player_2.hand[j]) and draw_war is False:
             self.receive_and_take_cards(False, i=i + 1)
-        elif self.player_1.hand[i].__eq__(self.player_2.hand[j]) and test is False:
+        elif self.player_1.hand[i].__eq__(self.player_2.hand[j]) and draw_war is False:
             self.war()
         else:
             self.winner = True
